@@ -14,8 +14,13 @@ Mayın Tarlası oyunu basit bir web uygulaması olduğu için HTML, CSS ve JavaS
 Mayın Tarlası oyununun kuralları :
 
 Oyun, bir tahta üzerinde oynanır. Tahtada mayınlar ve boş hücreler bulunur.
+
 Oyuncunun amacı, tüm boş hücreleri açmak ve mayınlara tıklamadan oyunu tamamlamaktır.
+
 Oyuncu bir hücreye tıkladığında, hücrede mayın varsa oyun kaybedilir.
+
 Mayın olmayan bir hücreye tıklandığında, hücrede etrafındaki mayınların sayısı görüntülenir.
+
 Eğer bir hücrede komşu hücrelerdeki tüm mayınlar açıldıysa, bu hücre otomatik olarak açılır ve etrafındaki diğer boş hücrelerin açılmasını sağlar.
+
 Oyun, tüm boş hücreler açıldığında ve hiçbir mayına tıklanmadığında kazanılır.

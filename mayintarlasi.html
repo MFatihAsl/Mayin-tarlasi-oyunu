@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D Mayın Tarlası Oyunu</title>
+    <style>td {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      vertical-align: middle;
+      border: 1px solid black;
+      font-size: 24px;
+      padding: 5px;
+    }
+    
+    td.tiklanmis {
+      background-color: rgb(177, 176, 176);
+      cursor: default;
+    }
+    
+    td.mayin {
+      position: relative;
+      background-color: red;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    table#oyunTahtasi {
+      margin: 0 auto;
+      border-spacing: 2px; /* Hücreler arasındaki boşluk */
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #fdfbfb;
+    }
+    </style>
+  </head>
+  <body>
+    <table id="oyunTahtasi" align="center" width="480px" height="500px"></table>
+    <script>var tahtaBoyutu = 10; // Tahta boyutu
+      var mayinSayisi = 8; // Mayın sayısı
+      
+      var oyunTahtasi = document.getElementById("oyunTahtasi");
+      
+      var tahtaVerileri = []; // Tahta verileri
+      var tiklananHucreSayisi = 0; // Tıklanan hücre sayısı
+      
+      // Mayınları tahtaya yerleştir
+      function mayinlariYerlestir() {
+        var yerlestirilenMayinSayisi = 0;
+        while (yerlestirilenMayinSayisi < mayinSayisi) {
+          var x = Math.floor(Math.random() * tahtaBoyutu);
+          var y = Math.floor(Math.random() * tahtaBoyutu);
+          if (tahtaVerileri[x][y] !== "mayin") {
+            tahtaVerileri[x][y] = "mayin";
+            yerlestirilenMayinSayisi++;
+          }
+        }
+      }
+      
+      // Komşu hücreleri kontrol et
+      function komsuHucreSayisiniKontrolEt(x, y) {
+        var mayinSayisi = 0;
+        for (var xOffset = -1; xOffset <= 1; xOffset++) {
+          for (var yOffset = -1; yOffset <= 1; yOffset++) {
+            var xIndex = x + xOffset;
+            var yIndex = y + yOffset;
+            if (xIndex >= 0 && xIndex < tahtaBoyutu && yIndex >= 0 && yIndex < tahtaBoyutu) {
+              if (tahtaVerileri[xIndex][yIndex] === "mayin") {
+                mayinSayisi++;
+              }
+            }
+          }
+        }
+        return mayinSayisi;
+      }
+      
+      // Tahtayı oluştur
+      function tahtaOlustur() {
+        for (var i = 0; i < tahtaBoyutu; i++) {
+          var satir = oyunTahtasi.insertRow();
+          var satirVerileri = [];
+          for (var j = 0; j < tahtaBoyutu; j++) {
+            var hucre = satir.insertCell();
+            hucre.addEventListener("click", hucreTiklama);
+            satirVerileri.push("bos");
+          }
+          tahtaVerileri.push(satirVerileri);
+        }
+      }
+      
+      // Hücre tıklandığında çalışır
+      function hucreTiklama(event) {
+        var tiklananHucre = event.target;
+        var x = tiklananHucre.parentNode.rowIndex;
+        var y = tiklananHucre.cellIndex;
+        tiklananHucre.classList.add("checked");
+      
+        // Hücreye tıklandıysa ve mayın varsa
+        if (tahtaVerileri[x][y] === "mayin") {
+          if (!tiklananHucre.classList.contains("tiklanmis")) {
+            tiklananHucre.classList.add("tiklanmis", "mayin");
+            tiklananHucre.innerHTML = ""; 
+          } else {
+            return;
+          }
+          
+          alert("Mayına Tıkladınız! Oyun Bitti!");
+          oyunuSifirla();
+          return;
+        }
+      
+        // Hücreye tıklandıysa ve mayın yoksa
+        if (tiklananHucre.classList.contains("tiklanmis")) {
+          return;
+          }
+          
+          tiklananHucre.classList.add("tiklanmis");
+          
+          // Mayın sayısını kontrol et
+          var komsuMayinSayisi = komsuHucreSayisiniKontrolEt(x, y);
+          if (komsuMayinSayisi > 0) {
+          tiklananHucre.innerHTML = komsuMayinSayisi;
+          tiklananHucreSayisi++;
+          kazanmaKontrolu();
+          return;
+          }
+          
+          // Tüm komşu hücreleri kontrol et
+          for (var xOffset = -1; xOffset <= 1; xOffset++) {
+          for (var yOffset = -1; yOffset <= 1; yOffset++) {
+          var xIndex = x + xOffset;
+          var yIndex = y + yOffset;
+          if (xIndex >= 0 && xIndex < tahtaBoyutu && yIndex >= 0 && yIndex < tahtaBoyutu) {
+          var hucreVerisi = tahtaVerileri[xIndex][yIndex];
+          if (hucreVerisi === "bos") {
+          var hucreElementi = oyunTahtasi.rows[xIndex].cells[yIndex];
+          hucreElementi.classList.add("tiklanmis");
+          tiklananHucreSayisi++;
+          hucreTiklama({ target: hucreElementi });
+          }
+          }
+          }
+          }
+          
+          kazanmaKontrolu();
+          }
+          
+          // Oyunu sıfırla
+          function oyunuSifirla() {
+          oyunTahtasi.innerHTML = "";
+          tahtaVerileri = [];
+          tiklananHucreSayisi = 0;
+          tahtaOlustur();
+          mayinlariYerlestir();
+          }
+          
+          // Oyunu kazanmayı kontrol et
+          var oyunKazanildi = false;
+          function kazanmaKontrolu() {
+          var bosHucreSayisi = tahtaBoyutu * tahtaBoyutu - mayinSayisi;
+          if (tiklananHucreSayisi === bosHucreSayisi) {
+          oyunKazanildi = true;
+          alert("Tebrikler, Oyunu Kazandınız!");
+          oyunuSifirla();
+          }
+          }
+          
+          // Oyunu başlat
+          tahtaOlustur();
+          mayinlariYerlestir();
+      </script>
+  </body>
+</html>
